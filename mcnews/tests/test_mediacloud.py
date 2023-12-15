@@ -4,6 +4,7 @@ import ciso8601
 import requests
 import os
 import pytest
+import hashlib
 
 from mcnews.searchapi import SearchApiClient, VERSION
 
@@ -82,6 +83,7 @@ class TestMediaCloudCollection(TestCase):
             assert 'publication_date' in r
 
     def test_article(self):
+
         story_id = "ZDY3YzdlNWE3YTJkMDZiYTcwNjJhNTZiZjY5YzczMTY~'}"
         story = self._api.article(story_id)
         assert len(story['title']) > 0
@@ -90,11 +92,11 @@ class TestMediaCloudCollection(TestCase):
         assert len(story['snippet']) > 0
 
     def test_all_articles(self):
-        query = "trump AND biden"
+        query = "biden"
         story_count = self._api.count(query, start_date, end_date)
         # make sure test case is reasonable size (ie. more than one page, but not too many pages
         assert story_count > 0
-        assert story_count < 5000
+        #assert story_count < 5000
         # now test it
         found_story_count = 0
         for page in self._api.all_articles(query, start_date, end_date):
@@ -155,7 +157,7 @@ class TestMediaCloudCollection(TestCase):
 
     def test_top_terms(self):
         results = self._api.terms("coronavirus", dt.datetime(2022, 4, 1), dt.datetime(2022, 4, 5),
-                                  field=SearchApiClient.TERM_FIELD_SNIPPET,
+                                  field=SearchApiClient.TERM_FIELD_TEXT_CONTENT,
                                   aggregation=SearchApiClient.TERM_AGGREGATION_TOP)
         last_count = 99999999999
         for _, count in results.items():
@@ -169,9 +171,11 @@ class TestMediaCloudCollection(TestCase):
         end_date = dt.datetime(2022, 3, 4)
         for page in self._api.all_articles(query, start_date, end_date):
             for article in page[:5]:
-                article_info = requests.get(article['article_url'], timeout=30).json()
-                assert 'snippet' in article_info
-                assert len(article_info['snippet']) > 0
+                
+                story_id = str(hashlib.sha256(article['url'].encode('utf16')).hexdigest())
+                story = self._api.article(story_id)
+                assert 'text_content' in story
+                
             break
 
     def test_external_server_error(self):

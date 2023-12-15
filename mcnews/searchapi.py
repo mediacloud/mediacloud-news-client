@@ -15,8 +15,8 @@ class SearchApiClient:
     TIMEOUT_SECS = 30
 
     # constants used when requesting top terms
-    TERM_FIELD_TITLE = "title"
-    TERM_FIELD_SNIPPET = "snippet"
+    TERM_FIELD_TITLE = "article_title"
+    TERM_FIELD_TEXT_CONTENT = "text_content"
     TERM_AGGREGATION_TOP = "top"
     TERM_AGGREGATION_SIGNIFICANT = "significant"
     TERM_AGGREGATION_RARE = "rare"
