@@ -19,7 +19,7 @@ class TestMediaCloudCollection(TestCase):
 
     def setUp(self) -> None:
         self._api = SearchApiClient(COLLECTION_MEDIACLOUD)
-        self._api.API_BASE_URL = "http://localhost:8888/{}/".format(VERSION)
+        self._api.API_BASE_URL = "http://localhost:8010/{}/".format(VERSION)
 
     def test_count(self):
         results = self._api.count("coronavirus", start_date, end_date)

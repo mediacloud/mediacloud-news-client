@@ -17,7 +17,7 @@ this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.md'), 'r', encoding='utf8') as f:
     long_description = f.read()
 
-setup(name='mediacloud-news-search',
+setup(name='mediacloud-news-client',
       maintainer='Rahul Bhargava',
       maintainer_email='r.bhargava@northeastern.edu',
       version=version,
@@ -31,7 +31,7 @@ setup(name='mediacloud-news-search',
       install_requires=REQUIRED_PACKAGES,
       extras_require={'dev': ['pytest', 'twine']},
       project_urls={
-              'Bug Reports': 'https://github.com/mediacloud/mediacloud-news-search/issues',
-              'Source': 'https://github.com/mediacloud/mediacloud-news-search',
+              'Bug Reports': 'https://github.com/mediacloud/mediacloud-news-client/issues',
+              'Source': 'https://github.com/mediacloud/mediacloud-news-client',
           },
       )

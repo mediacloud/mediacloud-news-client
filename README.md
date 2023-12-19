@@ -10,7 +10,7 @@ Installation
 ------------
 
 NB: TBD
-`pip install wayback-news-search`
+`pip install mediacloud-news-client`
 
 
 Basic Usage
@@ -22,8 +22,8 @@ Counting matching stories:
 from mcnews.searchapi import SearchApiClient
 import datetime as dt
 
-api = SearchApiClient("mediacloud")
-api.count("coronavirus", dt.datetime(2022, 3, 1), dt.datetime(2022, 4, 1))
+api = SearchApiClient("mediacloud_search_text_*")
+api.count("coronavirus", dt.datetime(2023, 11, 1), dt.datetime(2023, 12, 1))
 ```
 
 Paging over all matching results:
@@ -32,8 +32,8 @@ Paging over all matching results:
 from mcnews.searchapi import SearchApiClient
 import datetime as dt
 
-api = SearchApiClient("mediacloud")
-for page in api.all_articles("coronavirus", dt.datetime(2022, 3, 1), dt.datetime(2022, 4, 1)):
+api = SearchApiClient("mediacloud_search_text_*")
+for page in api.all_articles("coronavirus", dt.datetime(2023, 11, 1), dt.datetime(2023, 12, 1)):
     do_something(page)
 ```
 
@@ -62,6 +62,7 @@ Distribution
 Version History
 ---------------
 
+* __v2.0.0__ - Fresh start as mediacloud-news-client
 * __v1.2.1__ - fix paging bug triggered by no results
 * __v1.2.0__ - add support for new `expanded` results, and more integration testing
 * __v1.1.0__ - add new `paged_articles` method to allow paging over all results

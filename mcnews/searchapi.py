@@ -45,11 +45,6 @@ class SearchApiClient:
             return []
         return util.dict_to_list(results['topdomains'])
 
-    def top_tlds(self, query: str, start_date: dt.datetime, end_date: dt.datetime, **kwargs) -> List[Dict]:
-        results = self._overview_query(query, start_date, end_date, **kwargs)
-        if self._is_no_results(results):
-            return []
-        return util.dict_to_list(results['toptlds'])
 
     def top_languages(self, query: str, start_date: dt.datetime, end_date: dt.datetime, **kwargs) -> List[Dict]:
         results = self._overview_query(query, start_date, end_date, **kwargs)
@@ -161,5 +156,5 @@ class SearchApiClient:
         if r.status_code >= 500:
             raise RuntimeError("API Server Error {}: a bad query string could have triggered this. Endpoint: {},"
                                " Params: {}".format(r.status_code, endpoint_url, params))
-
+        
         return r.json(), r
