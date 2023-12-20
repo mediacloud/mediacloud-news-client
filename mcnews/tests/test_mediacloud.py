@@ -156,10 +156,16 @@ class TestMediaCloudCollection(TestCase):
             assert len(r['name']) == 2
 
     def test_top_terms(self):
-        results = self._api.terms("coronavirus", dt.datetime(2022, 4, 1), dt.datetime(2022, 4, 5),
+        query = "trump"
+
+        count = self._api.count(query, start_date, end_date)
+        assert count > 0
+
+        results = self._api.terms(query, start_date, end_date,
                                   field=SearchApiClient.TERM_FIELD_TEXT_CONTENT,
                                   aggregation=SearchApiClient.TERM_AGGREGATION_TOP)
         last_count = 99999999999
+        print(results.items())
         for _, count in results.items():
             assert last_count >= count
             last_count = count
@@ -167,8 +173,8 @@ class TestMediaCloudCollection(TestCase):
     def test_content_via_article_url(self):
         # make sure we can fetch the full content for articles - in the poorly named `snippet` field
         query = "trump"
-        start_date = dt.datetime(2022, 3, 4)
-        end_date = dt.datetime(2022, 3, 4)
+        start_date = dt.datetime(2023, 12, 1)
+        end_date = dt.datetime(2023, 12, 4)
         for page in self._api.all_articles(query, start_date, end_date):
             for article in page[:5]:
                 
@@ -181,8 +187,8 @@ class TestMediaCloudCollection(TestCase):
     def test_external_server_error(self):
         err_url = "https://centralasia.media/news:1796533?from=rss".split("/")[-1].split("?")[0]
         bad_query = f"url:*{err_url}*"
-        start_date = dt.datetime(2022, 8, 1)
-        end_date = dt.datetime(2022, 8, 5)
+        start_date = dt.datetime(2023, 12, 1)
+        end_date = dt.datetime(2023, 12, 5)
         with self.assertRaises(RuntimeError):
             next(self._api.all_articles(bad_query, start_date, end_date))
 
