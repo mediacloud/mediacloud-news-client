@@ -1,6 +1,7 @@
 name: Integration test against news-search-api:main
 
 on:
+  workflow_dispatch:
   push:
     branches: ["main"]
   pull_request:
