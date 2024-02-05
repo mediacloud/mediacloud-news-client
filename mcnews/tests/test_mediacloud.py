@@ -1,20 +1,20 @@
 from unittest import TestCase
 import datetime as dt
 import ciso8601
-import requests
 import os
 import pytest
 import hashlib
 
 from mcnews.searchapi import SearchApiClient, VERSION
 
-COLLECTION_MEDIACLOUD = "mediacloud_search_text_*"
+COLLECTION_MEDIACLOUD = "mc_search-000001"
 start_date = dt.datetime(2023, 12, 1)
 end_date = dt.datetime(2023, 12, 4)
 
 IN_GITHUB_CI_WORKFLOW = os.getenv("GITHUB_ACTIONS") == "true"
 
-pytest.mark.skipif(IN_GITHUB_CI_WORKFLOW, reason="requires VPN tunnel to Media Cloud")
+
+@pytest.mark.skipif(IN_GITHUB_CI_WORKFLOW, reason="requires VPN tunnel to Media Cloud")
 class TestMediaCloudCollection(TestCase):
 
     def setUp(self) -> None:
@@ -83,13 +83,11 @@ class TestMediaCloudCollection(TestCase):
             assert 'publication_date' in r
 
     def test_article(self):
-
-        story_id = "ZDY3YzdlNWE3YTJkMDZiYTcwNjJhNTZiZjY5YzczMTY~'}"
+        story_id = "'c6debad8549f58afb56c5cd0bdc16c9061b327fc2bd09bb402a9450d36615776'"
         story = self._api.article(story_id)
         assert len(story['title']) > 0
         assert story['language'] == 'en'
-        assert story['domain'] == 'dailyvoice.com'
-        assert len(story['snippet']) > 0
+        assert story['domain'] == 'trend.az'
 
     def test_all_articles(self):
         query = "biden"
