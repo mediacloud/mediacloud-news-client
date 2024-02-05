@@ -102,6 +102,30 @@ class TestMediaCloudCollection(TestCase):
             found_story_count += len(page)
         assert found_story_count == story_count
 
+    def test_paged_articles_all(self):
+        query = "biden"
+        start_date = dt.datetime(2023, 11, 25)
+        end_date = dt.datetime(2023, 11, 26)
+        story_count = self._api.count(query, start_date, end_date)
+        # make sure test case is reasonable size (ie. more than one page, but not too many pages
+        assert story_count > 1000
+        assert story_count < 10000
+        # fetch all pages
+        prior_tokens = []
+        stories = []
+        next_token = None
+        more_stories = True
+        page_count = 0
+        while more_stories:
+            page, next_token = self._api.paged_articles(query, start_date, end_date, pagination_token=next_token)
+            stories += page
+            assert next_token not in prior_tokens
+            prior_tokens.append(next_token)
+            page_count += 1
+            more_stories = next_token is not None
+        assert len(stories) > (story_count * 0.8)
+        assert page_count > (1 + story_count / 1000)
+
     def test_paged_articles(self):
         query = "biden"
         start_date = dt.datetime(2023, 11, 25)
