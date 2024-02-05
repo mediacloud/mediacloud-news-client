@@ -83,17 +83,18 @@ class TestMediaCloudCollection(TestCase):
             assert 'publication_date' in r
 
     def test_article(self):
-        story_id = "'c6debad8549f58afb56c5cd0bdc16c9061b327fc2bd09bb402a9450d36615776'"
+        story_id = "c6debad8549f58afb56c5cd0bdc16c9061b327fc2bd09bb402a9450d36615776"
         story = self._api.article(story_id)
-        assert len(story['title']) > 0
+        assert len(story['article_title']) > 0
         assert story['language'] == 'en'
-        assert story['domain'] == 'trend.az'
+        assert story['canonical_domain'] == 'trend.az'
 
     def test_all_articles(self):
         query = "biden"
         story_count = self._api.count(query, start_date, end_date)
         # make sure test case is reasonable size (ie. more than one page, but not too many pages
         assert story_count > 0
+        
         #assert story_count < 5000
         # now test it
         found_story_count = 0
@@ -110,6 +111,7 @@ class TestMediaCloudCollection(TestCase):
         # make sure test case is reasonable size (ie. more than one page, but not too many pages
         assert story_count > 1000
         assert story_count < 10000
+        
         # fetch all pages
         prior_tokens = []
         stories = []
@@ -119,10 +121,12 @@ class TestMediaCloudCollection(TestCase):
         while more_stories:
             page, next_token = self._api.paged_articles(query, start_date, end_date, pagination_token=next_token)
             stories += page
+           
             assert next_token not in prior_tokens
             prior_tokens.append(next_token)
             page_count += 1
             more_stories = next_token is not None
+        
         assert len(stories) > (story_count * 0.8)
         assert page_count > (1 + story_count / 1000)
 
@@ -187,12 +191,12 @@ class TestMediaCloudCollection(TestCase):
                                   field=SearchApiClient.TERM_FIELD_TEXT_CONTENT,
                                   aggregation=SearchApiClient.TERM_AGGREGATION_TOP)
         last_count = 99999999999
-        print(results.items())
+        
         for _, count in results.items():
             assert last_count >= count
             last_count = count
 
-    def test_content_via_article_url(self):
+    def test_content_via_article_id(self):
         # make sure we can fetch the full content for articles - in the poorly named `snippet` field
         query = "trump"
         start_date = dt.datetime(2023, 12, 1)
@@ -200,7 +204,8 @@ class TestMediaCloudCollection(TestCase):
         for page in self._api.all_articles(query, start_date, end_date):
             for article in page[:5]:
                 
-                story_id = str(hashlib.sha256(article['url'].encode('utf16')).hexdigest())
+                story_id = article["id"]
+                
                 story = self._api.article(story_id)
                 assert 'text_content' in story
                 
