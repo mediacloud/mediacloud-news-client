@@ -3,4 +3,6 @@ __pycache__
 .pytest_cache
 build
 dist
+.DS_STORE
+venv/
 *.egg-info
