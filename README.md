@@ -1,7 +1,9 @@
 Mediacloud News Archive Client
 ===================================
 
-🚧 _under construction_ 🚧
+🚧 _Archived_ 🚧
+
+The functionality of this package has been folded entierly into mediacloud/mc-providers. As development here will stop, the package is archived
 
 A simple client library to access the Wayback Machine news archive search.
 
