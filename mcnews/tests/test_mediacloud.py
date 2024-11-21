@@ -1,6 +1,7 @@
 from unittest import TestCase
 import datetime as dt
 import ciso8601
+import csv
 import requests
 import os
 import pytest
@@ -8,18 +9,19 @@ import hashlib
 
 from mcnews.searchapi import SearchApiClient, VERSION
 
-COLLECTION_MEDIACLOUD = "mediacloud_search_text_*"
+
 start_date = dt.datetime(2023, 12, 1)
 end_date = dt.datetime(2023, 12, 4)
 
 IN_GITHUB_CI_WORKFLOW = os.getenv("GITHUB_ACTIONS") == "true"
 
-pytest.mark.skipif(IN_GITHUB_CI_WORKFLOW, reason="requires VPN tunnel to Media Cloud")
+@pytest.mark.skipif(IN_GITHUB_CI_WORKFLOW, reason="requires VPN tunnel to Media Cloud")
+@pytest.mark.usefixtures("api_client")
 class TestMediaCloudCollection(TestCase):
 
-    def setUp(self) -> None:
-        self._api = SearchApiClient(COLLECTION_MEDIACLOUD)
-        self._api.API_BASE_URL = "http://localhost:8010/{}/".format(VERSION)
+    #def setUp(self) -> None:
+    #    self._api = SearchApiClient(COLLECTION_MEDIACLOUD)
+    #    self._api.API_BASE_URL = f"http://localhost:8100/{VERSION}/"
 
     def test_count(self):
         results = self._api.count("coronavirus", start_date, end_date)
@@ -83,7 +85,6 @@ class TestMediaCloudCollection(TestCase):
             assert 'publication_date' in r
 
     def test_article(self):
-
         story_id = "ZDY3YzdlNWE3YTJkMDZiYTcwNjJhNTZiZjY5YzczMTY~'}"
         story = self._api.article(story_id)
         assert len(story['title']) > 0
@@ -92,7 +93,7 @@ class TestMediaCloudCollection(TestCase):
         assert len(story['snippet']) > 0
 
     def test_all_articles(self):
-        query = "biden"
+        query = "war"
         story_count = self._api.count(query, start_date, end_date)
         # make sure test case is reasonable size (ie. more than one page, but not too many pages
         assert story_count > 0
@@ -211,3 +212,14 @@ class TestMediaCloudCollection(TestCase):
         assert "dailyvoice.com/new-york/mountpleasant" in sample_mountplesant[0]['url']
         mountpleasant_path_dv = self._api.count("original_url:*dailyvoice.com/new-york/mountpleasant*", start_date, end_date)
         assert mountpleasant_path_dv > 0
+
+    def test_header_too_long(self):
+        self._api.TIMEOUT_SECS = 500
+        with open(os.path.join(os.path.dirname(__file__), 'data', 'Collection-38379429-sources-20240611133536.csv')) as f:
+            reader = csv.DictReader(f)
+            all_domains = set([row['name'] for row in reader])
+        query = '"new trial" AND canonical_domain:({})'.format(" OR ".join(all_domains))
+        start_date = dt.datetime(2024, 1, 1)
+        end_date = dt.datetime(2024, 6, 16)
+        page1, next_token1 = self._api.paged_articles(query, start_date, end_date)
+        assert len(page1) > 0
